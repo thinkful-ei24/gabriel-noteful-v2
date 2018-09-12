@@ -1,8 +1,7 @@
 /* global $ store api moment*/
 'use strict';
 
-const noteful = (function () {
-
+const noteful = (function() {
   function render() {
     const notesList = generateNotesList(store.notes, store.currentNote);
     $('.js-notes-list').html(notesList);
@@ -35,35 +34,47 @@ const noteful = (function () {
    * GENERATE HTML FUNCTIONS
    */
   function generateNotesList(list, currNote) {
-    const listItems = list.map(item => `
-      <li data-id="${item.id}" class="js-note-element ${currNote.id === item.id ? 'active' : ''}">
+    const listItems = list.map(
+      item => `
+      <li data-id="${item.id}" class="js-note-element ${
+    currNote.id === item.id ? 'active' : ''
+  }">
         <a href="#" class="name js-note-link">${item.title}</a>
         <button class="removeBtn js-note-delete-button">X</button>
         <div class="metadata">
             <div class="date">${moment(item.created).calendar()}</div>
             <div class="tags">${getTagsCommaSeparated(item.tags)}</div>
           </div>
-      </li>`);
+      </li>`
+    );
     return listItems.join('');
   }
 
   function generateFolderList(list, currQuery) {
     const showAllItem = `
-      <li data-id="" class="js-folder-item ${!currQuery.folderId ? 'active' : ''}">
+      <li data-id="" class="js-folder-item ${
+  !currQuery.folderId ? 'active' : ''
+  }">
         <a href="#" class="name js-folder-link">All</a>
       </li>`;
 
-    const listItems = list.map(item => `
-      <li data-id="${item.id}" class="js-folder-item ${currQuery.folderId === item.id ? 'active' : ''}">
+    const listItems = list.map(
+      item => `
+      <li data-id="${item.id}" class="js-folder-item ${
+    currQuery.folderId === item.id ? 'active' : ''
+  }">
         <a href="#" class="name js-folder-link">${item.name}</a>
         <button class="removeBtn js-folder-delete">X</button>
-      </li>`);
+      </li>`
+    );
 
     return [showAllItem, ...listItems].join('');
   }
 
   function generateFolderSelect(list) {
-    const notes = list.map(item => `<option value="${item.id}">${item.name}</option>`);
+    const notes = list.map(
+      item => `<option value="${item.id}">${item.name}</option>`
+    );
     return '<option value="">Select Folder:</option>' + notes.join('');
   }
 
@@ -73,16 +84,22 @@ const noteful = (function () {
         <a href="#" class="name js-tag-link">All</a>
       </li>`;
 
-    const listItems = list.map(item => `
-      <li data-id="${item.id}" class="js-tag-item ${currQuery.tagId === item.id ? 'active' : ''}">
+    const listItems = list.map(
+      item => `
+      <li data-id="${item.id}" class="js-tag-item ${
+    currQuery.tagId === item.id ? 'active' : ''
+  }">
         <a href="#" class="name js-tag-link">${item.name}</a>
         <button class="removeBtn js-tag-delete">X</button>
-      </li>`);
+      </li>`
+    );
     return [showAllItem, ...listItems].join('');
   }
 
   function generateTagsSelect(list) {
-    const notes = list.map(item => `<option value="${item.id}">${item.name}</option>`);
+    const notes = list.map(
+      item => `<option value="${item.id}">${item.name}</option>`
+    );
     return notes.join('');
   }
 
@@ -90,17 +107,23 @@ const noteful = (function () {
    * HELPERS
    */
   function getNoteIdFromElement(item) {
-    const id = $(item).closest('.js-note-element').data('id');
+    const id = $(item)
+      .closest('.js-note-element')
+      .data('id');
     return id;
   }
 
   function getFolderIdFromElement(item) {
-    const id = $(item).closest('.js-folder-item').data('id');
+    const id = $(item)
+      .closest('.js-folder-item')
+      .data('id');
     return id;
   }
 
   function getTagIdFromElement(item) {
-    const id = $(item).closest('.js-tag-item').data('id');
+    const id = $(item)
+      .closest('.js-tag-item')
+      .data('id');
     return id;
   }
 
@@ -117,11 +140,10 @@ const noteful = (function () {
 
       const noteId = getNoteIdFromElement(event.currentTarget);
 
-      api.details(`/api/notes/${noteId}`)
-        .then((response) => {
-          store.currentNote = response;
-          render();
-        });
+      api.details(`/api/notes/${noteId}`).then(response => {
+        store.currentNote = response;
+        render();
+      });
     });
   }
 
@@ -129,19 +151,19 @@ const noteful = (function () {
     $('.js-notes-search-form').on('submit', event => {
       event.preventDefault();
 
-      store.currentQuery.searchTerm = $(event.currentTarget).find('input').val();
+      store.currentQuery.searchTerm = $(event.currentTarget)
+        .find('input')
+        .val();
 
-      api.search('/api/notes', store.currentQuery)
-        .then(response => {
-          store.notes = response;
-          render();
-        });
+      api.search('/api/notes', store.currentQuery).then(response => {
+        store.notes = response;
+        render();
+      });
     });
   }
 
-
   function handleNoteFormSubmit() {
-    $('.js-note-edit-form').on('submit', function (event) {
+    $('.js-note-edit-form').on('submit', function(event) {
       event.preventDefault();
 
       const editForm = $(event.currentTarget);
@@ -154,7 +176,8 @@ const noteful = (function () {
       };
 
       if (store.currentNote.id) {
-        api.update(`/api/notes/${noteObj.id}`, noteObj)
+        api
+          .update(`/api/notes/${noteObj.id}`, noteObj)
           .then(updateResponse => {
             store.currentNote = updateResponse;
             return api.search('/api/notes', store.currentQuery);
@@ -164,7 +187,8 @@ const noteful = (function () {
             render();
           });
       } else {
-        api.create('/api/notes', noteObj)
+        api
+          .create('/api/notes', noteObj)
           .then(createResponse => {
             store.currentNote = createResponse;
             return api.search('/api/notes', store.currentQuery);
@@ -190,7 +214,8 @@ const noteful = (function () {
       event.preventDefault();
       const noteId = getNoteIdFromElement(event.currentTarget);
 
-      api.remove(`/api/notes/${noteId}`)
+      api
+        .remove(`/api/notes/${noteId}`)
         .then(() => {
           if (noteId === store.currentNote.id) {
             store.currentNote = {};
@@ -217,12 +242,10 @@ const noteful = (function () {
         store.currentNote = {};
       }
 
-      console.info('Get notes by folderId, coming soon...');
-      // api.search('/api/notes', store.currentQuery)
-      //   .then(response => {
-      //     store.notes = response;
-      //     render();
-      //   });
+      api.search('/api/notes', store.currentQuery).then(response => {
+        store.notes = response;
+        render();
+      });
     });
   }
 
@@ -232,17 +255,16 @@ const noteful = (function () {
 
       const newFolderName = $('.js-new-folder-entry').val();
 
-      console.info('Create a folder, coming soon...');
-      // api.create('/api/folders', { name: newFolderName })
-      //   .then(() => {
-      //     $('.js-new-folder-entry').val();
-      //     return api.search('/api/folders');
-      //   }).then(response => {
-      //     store.folders = response;
-      //     render();
-      //   }).catch(err => {
-      //     $('.js-error-message').text(err.responseJSON.message);
-      //   });
+      api.create('/api/folders', { name: newFolderName })
+        .then(() => {
+          $('.js-new-folder-entry').val();
+          return api.search('/api/folders');
+        }).then(response => {
+          store.folders = response;
+          render();
+        }).catch(err => {
+          $('.js-error-message').text(err.responseJSON.message);
+        });
     });
   }
 
@@ -258,15 +280,14 @@ const noteful = (function () {
         store.currentNote = {};
       }
 
-      console.info('Delete a folder, coming soon...');
-      // api.remove(`/api/folders/${folderId}`)
-      //   .then(() => {
-      //     return api.search('/api/folders');
-      //   })
-      //   .then(response => {
-      //     store.folders = response;
-      //     render();
-      //   });
+      api.remove(`/api/folders/${folderId}`)
+        .then(() => {
+          return api.search('/api/folders');
+        })
+        .then(response => {
+          store.folders = response;
+          render();
+        });
     });
   }
 
@@ -357,7 +378,6 @@ const noteful = (function () {
   // This object contains the only exposed methods from this module:
   return {
     render: render,
-    bindEventListeners: bindEventListeners,
+    bindEventListeners: bindEventListeners
   };
-
-}());
+})();
