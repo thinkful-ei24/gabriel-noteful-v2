@@ -56,21 +56,7 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
 
-  knex
-    .select(
-      'notes.id',
-      'title',
-      'content',
-      'folders.id as folderId',
-      'folders.name as folderName',
-      'tags.id as tagId',
-      'tags.name as tagName'
-    )
-    .from('notes')
-    .leftJoin('folders', 'notes.folder_id', 'folders.id')
-    .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
-    .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
-    .where('notes.id', id)
+  getNoteByID(id)
     .then(result => {
       if (result) {
         const hydrated = hydrateNotes(result);
@@ -121,21 +107,7 @@ router.put('/:id', (req, res, next) => {
     })
     .then(() => {
       // Select the new note and leftJoin on folders and tags
-      return knex
-        .select(
-          'notes.id',
-          'title',
-          'content',
-          'folders.id as folder_id',
-          'folders.name as folderName',
-          'tags.id as tagId',
-          'tags.name as tagName'
-        )
-        .from('notes')
-        .leftJoin('folders', 'notes.folder_id', 'folders.id')
-        .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
-        .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
-        .where('notes.id', noteId);
+      return getNoteByID(noteId);
     })
     .then(result => {
       // if result hydrate respond 200 and object
@@ -182,21 +154,7 @@ router.post('/', (req, res, next) => {
       return knex.insert(newTags).into('notes_tags');
     })
     .then(() => {
-      return knex
-        .select(
-          'notes.id',
-          'title',
-          'content',
-          'folders.id as folder_id',
-          'folders.name as folderName',
-          'tags.id as tagId',
-          'tags.name as tagName'
-        )
-        .from('notes')
-        .leftJoin('folders', 'notes.folder_id', 'folders.id')
-        .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
-        .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
-        .where('notes.id', noteId);
+      return getNoteByID(noteId);
     })
     .then(result => {
       if (result) {
@@ -226,6 +184,22 @@ router.delete('/:id', (req, res, next) => {
     .catch(err => next(err));
 });
 
-module.exports = router;
+function getNoteByID(id) {
+  return knex
+    .select(
+      'notes.id',
+      'title',
+      'content',
+      'folders.id as folder_id',
+      'folders.name as folderName',
+      'tags.id as tagId',
+      'tags.name as tagName'
+    )
+    .from('notes')
+    .leftJoin('folders', 'notes.folder_id', 'folders.id')
+    .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+    .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
+    .where('notes.id', id);
+}
 
-// https://i.imgur.com/dpsh8U6.jpg
+module.exports = router;
