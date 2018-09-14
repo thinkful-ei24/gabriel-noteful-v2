@@ -58,7 +58,7 @@ router.get('/:id', (req, res, next) => {
 
   getNoteByID(id)
     .then(result => {
-      if (result) {
+      if (result.length === 1) {
         const hydrated = hydrateNotes(result);
         res.json(hydrated[0]);
       } else {
