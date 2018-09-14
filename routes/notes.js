@@ -112,7 +112,7 @@ router.put('/:id', (req, res, next) => {
     .then(result => {
       // if result hydrate respond 200 and object
       // else 404
-      if (result) {
+      if (result.length === 1) {
         const hydrated = hydrateNotes(result)[0];
         res.status(200).json(hydrated);
       } else {

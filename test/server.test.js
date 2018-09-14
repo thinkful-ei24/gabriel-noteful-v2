@@ -190,9 +190,10 @@ describe('Noteful API', function() {
 
       return chai
         .request(app)
-        .get(`/api/notes/${updateData.id}`)
+        .put('/api/notes/1565132')
+        .send(updateData)
         .then(function(res) {
-          expect(res).to.has.status(404);
+          expect(res).to.have.status(404);
         });
     });
 
