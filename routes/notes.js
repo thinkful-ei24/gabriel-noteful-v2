@@ -201,5 +201,4 @@ function getNoteByID(id) {
     .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
     .where('notes.id', id);
 }
-
 module.exports = router;
